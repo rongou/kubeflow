@@ -17,19 +17,6 @@ local image = params.image;
 local command = params.command;
 local args = params.args;
 
-local containerCommand =
-  if command != "null" then
-    {
-      command: command,
-    }
-  else {};
-local containerArgs =
-  if args != "null" then
-    {
-      args: std.split(args, ","),
-    }
-  else {};
-
 local mpiJobSimple = {
   apiVersion: "kubeflow.org/v1alpha1",
   kind: "MPIJob",
@@ -45,7 +32,9 @@ local mpiJobSimple = {
           {
             name: name,
             image: image,
-          } + containerCommand + containerArgs,
+            [if command != "null" then "command"]: [command],
+            [if args != "null" then "args"]: std.split(args, ","),
+          },
         ],
       },
     },
